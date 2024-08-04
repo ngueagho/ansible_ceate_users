@@ -1,0 +1,53 @@
+---
+  - name: loops
+    become: true
+    hosts: all
+    tasks:
+      - name: Add several users
+        ansible.builtin.user:
+          name: "{{ item.name }}"
+          state: present
+          create_home: yes
+          groups: "{{ item.groups }}"
+          shell: "{{ item.shells }}"
+          ssh_key_file: "./loop_key.pub "
+        loop:
+          - { name: 'roberto1', groups: 'sudo', shells: '/bin/bash' }
+          - { name: 'roberto2', groups: 'sudo', shells: '/bin/bash' }
+          - { name: 'roberto3', groups: 'sudo', shells: '/bin/sh' }
+          - { name: 'roberto4', groups: 'sudo', shells: '/bin/sh' }
+      
+      - name: create .ssh folder
+        command: mkdir "{{item.ssh_folder}}"
+        loop:
+          - {ssh_folder: '/home/roberto1/.ssh'}
+          - {ssh_folder: '/home/roberto2/.ssh'}
+          - {ssh_folder: '/home/roberto3/.ssh'}
+          - {ssh_folder: '/home/roberto4/.ssh'}
+
+      - name: create .ssh folder
+        ansible.builtin.file:
+          path: "{{item.ssh_folder}}"
+          state: directory
+          mode: '0755'
+          owner: "{{item.owner}}"
+          group: "{{item.owner}}"
+        loop:
+          - {ssh_folder: '/home/roberto1/.ssh' , owner: 'roberto1'}
+          - {ssh_folder: '/home/roberto2/.ssh' , owner: 'roberto2'}
+          - {ssh_folder: '/home/roberto3/.ssh' , owner: 'roberto3'}
+          - {ssh_folder: '/home/roberto4/.ssh' , owner: 'roberto4'}
+        
+
+      - name: copy the key file in the home directory
+        copy:
+          src: ./loop_key.pub
+          dest: "{{item.dest}}"
+          owner: "{{item.owner}}"
+          group: "{{item.owner}}"
+          mode: 0600
+        loop:
+          - {dest: '/home/roberto1/.ssh/authorized_keys' , owner: 'roberto1'}
+          - {dest: '/home/roberto2/.ssh/authorized_keys' , owner: 'roberto2'}
+          - {dest: '/home/roberto3/.ssh/authorized_keys' , owner: 'roberto3'}
+          - {dest: '/home/roberto4/.ssh/authorized_keys' , owner: 'roberto4'}
