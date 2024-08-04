@@ -17,7 +17,7 @@
           - { name: 'roberto3', groups: 'sudo', shells: '/bin/sh' }
           - { name: 'roberto4', groups: 'sudo', shells: '/bin/sh' }
       
-      - name: create .ssh folder
+      - name: create the.ssh folder
         command: mkdir "{{item.ssh_folder}}"
         loop:
           - {ssh_folder: '/home/roberto1/.ssh'}
